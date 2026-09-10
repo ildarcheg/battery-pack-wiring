@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battery Pack Wiring — meteo</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+  :root {
+    /* the parts book's palette — these two pages are siblings */
+    --ground:      #E4E9E8;
+    --surface:     #F4F7F6;
+    --surface-2:   #DCE3E2;
+    --ink:         #14191B;
+    --ink-2:       #4E5C5B;
+    --ink-3:       #7C8A88;
+    --rule:        #C3CDCB;
+    --rule-soft:   #D5DDDB;
+    --accent:      #C99109;
+    --accent-hi:   #E8B21E;
+    --pos:         #A8431D;
+    --pos-bg:      #EDDACF;
+    --neg:         #2F4858;
+    --open:        #2C6B52;
+    --open-bg:     #D3E3DA;
+
+    --measure: 66ch;
+    --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #0F1416;
+      --surface:   #161D1F;
+      --surface-2: #1F282A;
+      --ink:       #E3E9E7;
+      --ink-2:     #9DABA9;
+      --ink-3:     #74827F;
+      --rule:      #2B3639;
+      --rule-soft: #222C2E;
+      --accent:    #E8B21E;
+      --accent-hi: #F2C64C;
+      --pos:       #E08E62;
+      --pos-bg:    #332016;
+      --neg:       #9FBACB;
+      --open:      #6FBE96;
+      --open-bg:   #1B3229;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:    #0F1416;
+    --surface:   #161D1F;
+    --surface-2: #1F282A;
+    --ink:       #E3E9E7;
+    --ink-2:     #9DABA9;
+    --ink-3:     #74827F;
+    --rule:      #2B3639;
+    --rule-soft: #222C2E;
+    --accent:    #E8B21E;
+    --accent-hi: #F2C64C;
+    --pos:       #E08E62;
+    --pos-bg:    #332016;
+    --neg:       #9FBACB;
+    --open:      #6FBE96;
+    --open-bg:   #1B3229;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--ground); }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: var(--f-body); font-size: 16.5px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1060px; margin: 0 auto; padding: 40px 26px 90px;
+          display: flex; flex-direction: column; gap: 46px; }
+
+  header { display: flex; flex-direction: column; gap: 13px; }
+  .eyebrow { font-family: var(--f-mono); font-size: 11.5px; font-weight: 500;
+             letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  h1 { font-family: var(--f-display); font-weight: 700;
+       font-size: clamp(29px, 5vw, 42px); line-height: 1.08;
+       letter-spacing: -0.02em; text-wrap: balance; }
+  .standfirst { max-width: var(--measure); font-size: 18px; color: var(--ink-2); }
+  .provenance { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3);
+                border-top: 1px solid var(--rule); padding-top: 12px; }
+
+  section { display: flex; flex-direction: column; gap: 16px; }
+  h2 { font-family: var(--f-display); font-weight: 600; font-size: 22px;
+       letter-spacing: -0.01em; text-wrap: balance; }
+  h3 { font-family: var(--f-display); font-weight: 600; font-size: 16px; }
+  p { max-width: var(--measure); }
+  .dim { color: var(--ink-2); }
+  code, .net { font-family: var(--f-mono); font-size: 0.88em;
+               background: var(--surface-2); padding: 1px 5px; border-radius: 2px; }
+
+  .frame { background: var(--surface); border: 1px solid var(--rule);
+           border-radius: 4px; padding: 16px; overflow-x: auto; }
+  .frame svg { width: 100%; min-width: 760px; height: auto; display: block; }
+  .svg-label { font-family: var(--f-display); font-size: 12px; font-weight: 600;
+               fill: var(--ink); }
+  .svg-sub { font-family: var(--f-mono); font-size: 10.5px; fill: var(--ink-3); }
+  figcaption { font-size: 14.5px; color: var(--ink-2); margin-top: 10px;
+               max-width: var(--measure); }
+
+  .warn { background: var(--pos-bg); border-left: 4px solid var(--pos);
+          padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .note { background: var(--surface); border: 1px solid var(--rule);
+          border-left: 4px solid var(--accent); padding: 16px 20px;
+          display: flex; flex-direction: column; gap: 8px; }
+  .warn p, .note p { max-width: none; }
+
+  ol.steps { display: flex; flex-direction: column; gap: 14px; counter-reset: s;
+             list-style: none; }
+  ol.steps > li { display: grid; grid-template-columns: 34px 1fr; gap: 0 14px;
+                  align-items: start; }
+  ol.steps > li::before { counter-increment: s; content: counter(s);
+        font-family: var(--f-mono); font-size: 13px; font-weight: 500;
+        color: var(--ink); background: var(--surface-2); border-radius: 3px;
+        text-align: center; padding: 3px 0; }
+  ol.steps b { font-family: var(--f-display); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 13px; border-bottom: 1px solid var(--rule-soft);
+           vertical-align: top; }
+  thead th { background: var(--surface-2); border-bottom: 1px solid var(--rule);
+             font-family: var(--f-display); font-weight: 600; font-size: 13px; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.mono, .mono { font-family: var(--f-mono); font-size: 13px; }
+  .tbl { background: var(--surface); border: 1px solid var(--rule);
+         border-radius: 4px; overflow-x: auto; }
+
+  .open-item { display: grid; grid-template-columns: minmax(120px, auto) 1fr;
+               gap: 0; border: 1px solid var(--rule); background: var(--surface); }
+  .open-item + .open-item { border-top: none; }
+  .open-item > div { padding: 12px 15px; }
+  .open-item .id { font-family: var(--f-mono); font-size: 13px; font-weight: 500;
+                   background: var(--surface-2); border-right: 1px solid var(--rule); }
+  .open-item .what { font-size: 14.5px; }
+
+  footer { border-top: 1px solid var(--rule); padding-top: 18px;
+           font-size: 14px; color: var(--ink-2);
+           display: flex; flex-direction: column; gap: 8px; }
+  a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 640px) { .open-item { grid-template-columns: 1fr; }
+    .open-item .id { border-right: none; border-bottom: 1px solid var(--rule); } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <p class="eyebrow">meteo · the probe's power source</p>
+  <h1>Battery Pack Wiring</h1>
+  <p class="standfirst">Six 18650 cells become one 21 Ah battery, and that battery
+  reaches the rest of the probe through two wires and one plug. This is what joins
+  what, in what order, and which of those joints carries the whole probe's
+  current.</p>
+  <p class="provenance">Companion to <span class="net">buoy-parts-book.html</span>,
+  which carries the same power source from the plug onward. Topology from
+  ADR&nbsp;0005 and <span class="net">architecture-power-and-wiring.md</span>;
+  geometry from the 2026-09-03 integrated-platform note.</p>
+</header>
+
+<div class="warn">
+  <h3>Before anything else</h3>
+  <p><b>SoC-match the six cells to within ~50 mV of each other before you join
+  them.</b> Nothing in this design limits the balancing inrush between mismatched
+  neighbours — the moment two cells at different states of charge are bridged,
+  the difference is dumped through whatever joins them, at whatever current the
+  copper allows. Measure all six, charge or rest them together until they agree,
+  and only then fit the bus.</p>
+  <p>Every joint below is soldered to a <b>contact</b>, never to a cell. The cells
+  are protected button-tops that press against spring and plate contacts — nothing
+  is soldered or welded to a battery anywhere in this build.</p>
+</div>
+
+<section>
+  <h2>The pack, and where its two wires go</h2>
+  <figure>
+    <div class="frame">
+      <svg viewBox="0 0 1000 620" role="img" aria-label="Wiring schema of the six-cell battery pack. Six Panasonic NCR18650GA protected cells lie side by side in six printed bays at 21 millimetre pitch, all six in parallel. Each bay has two contacts: a spring on the negative end at the left and a flat plate on the positive button top at the right. A bare solid copper bus bar runs down each end wall in a 1.1 millimetre printed slot, soldered to all six contacts on that side. From the negative bus a 20 AWG silicone lead leaves at the bottom left; from the positive bus a 20 AWG lead leaves at the bottom right and passes through a 1.5 amp fuse. Both leads lace through a hole in the platform base for strain relief before reaching a JST-PH plug, which goes on to the fuel gauge's left port.">
+
+        <!-- ---------- the platform ---------- -->
+        <rect x="118" y="52" width="470" height="452" rx="7" fill="var(--surface-2)" stroke="var(--ink-2)" stroke-width="1.5"/>
+        <text class="svg-label" x="130" y="40">Battery_Platform &mdash; six printed bays</text>
+        <text class="svg-sub" x="130" y="522">bays at 21.0 pitch &middot; &Oslash;18.6 cell in a 19.0 bay</text>
+
+        <!-- ---------- six cells ---------- -->
+        <!-- row y centres: 96, 168, 240, 312, 384, 456 -->
+        <g>
+          <rect x="206" y="72" width="292" height="48" rx="6" fill="var(--surface)" stroke="var(--ink)"/>
+          <rect x="206" y="144" width="292" height="48" rx="6" fill="var(--surface)" stroke="var(--ink)"/>
+          <rect x="206" y="216" width="292" height="48" rx="6" fill="var(--surface)" stroke="var(--ink)"/>
+          <rect x="206" y="288" width="292" height="48" rx="6" fill="var(--surface)" stroke="var(--ink)"/>
+          <rect x="206" y="360" width="292" height="48" rx="6" fill="var(--surface)" stroke="var(--ink)"/>
+          <rect x="206" y="432" width="292" height="48" rx="6" fill="var(--surface)" stroke="var(--ink)"/>
+        </g>
+        <text class="svg-sub" x="352" y="101" text-anchor="middle" style="fill:var(--ink)">NCR18650GA &middot; protected</text>
+        <text class="svg-sub" x="352" y="173" text-anchor="middle" style="fill:var(--ink)">NCR18650GA &middot; protected</text>
+        <text class="svg-sub" x="352" y="245" text-anchor="middle" style="fill:var(--ink)">NCR18650GA &middot; protected</text>
+        <text class="svg-sub" x="352" y="317" text-anchor="middle" style="fill:var(--ink)">NCR18650GA &middot; protected</text>
+        <text class="svg-sub" x="352" y="389" text-anchor="middle" style="fill:var(--ink)">NCR18650GA &middot; protected</text>
+        <text class="svg-sub" x="352" y="461" text-anchor="middle" style="fill:var(--ink)">NCR18650GA &middot; protected</text>
+
+        <!-- ---------- contacts, negative (spring) ---------- -->
+        <g fill="var(--surface)" stroke="var(--neg)" stroke-width="1.4">
+          <rect x="182" y="82" width="20" height="28" rx="2"/>
+          <rect x="182" y="154" width="20" height="28" rx="2"/>
+          <rect x="182" y="226" width="20" height="28" rx="2"/>
+          <rect x="182" y="298" width="20" height="28" rx="2"/>
+          <rect x="182" y="370" width="20" height="28" rx="2"/>
+          <rect x="182" y="442" width="20" height="28" rx="2"/>
+        </g>
+        <text class="svg-sub" x="192" y="70" text-anchor="middle" style="fill:var(--neg)">&minus;</text>
+
+        <!-- ---------- contacts, positive (flat plate) ---------- -->
+        <g fill="var(--surface)" stroke="var(--pos)" stroke-width="1.4">
+          <rect x="502" y="82" width="20" height="28" rx="2"/>
+          <rect x="502" y="154" width="20" height="28" rx="2"/>
+          <rect x="502" y="226" width="20" height="28" rx="2"/>
+          <rect x="502" y="298" width="20" height="28" rx="2"/>
+          <rect x="502" y="370" width="20" height="28" rx="2"/>
+          <rect x="502" y="442" width="20" height="28" rx="2"/>
+        </g>
+        <text class="svg-sub" x="512" y="70" text-anchor="middle" style="fill:var(--pos)">+</text>
+
+        <!-- ---------- negative bus bar ---------- -->
+        <line x1="160" y1="86" x2="160" y2="466" stroke="var(--neg)" stroke-width="4"/>
+        <g stroke="var(--neg)" stroke-width="1.6">
+          <line x1="160" y1="96" x2="182" y2="96"/>
+          <line x1="160" y1="168" x2="182" y2="168"/>
+          <line x1="160" y1="240" x2="182" y2="240"/>
+          <line x1="160" y1="312" x2="182" y2="312"/>
+          <line x1="160" y1="384" x2="182" y2="384"/>
+          <line x1="160" y1="456" x2="182" y2="456"/>
+        </g>
+        <g fill="var(--neg)">
+          <circle cx="160" cy="96" r="3.2"/><circle cx="160" cy="168" r="3.2"/>
+          <circle cx="160" cy="240" r="3.2"/><circle cx="160" cy="312" r="3.2"/>
+          <circle cx="160" cy="384" r="3.2"/><circle cx="160" cy="456" r="3.2"/>
+        </g>
+        <text class="svg-label" x="30" y="252" style="fill:var(--neg)">&minus; bus</text>
+        <text class="svg-sub" x="30" y="268">bare solid</text>
+        <text class="svg-sub" x="30" y="281">18&ndash;20 AWG</text>
+        <text class="svg-sub" x="30" y="294">in the 1.100</text>
+        <text class="svg-sub" x="30" y="307">&times; 111.2 slot</text>
+        <text class="svg-sub" x="30" y="326">six joints,</text>
+        <text class="svg-sub" x="30" y="339">one per bay</text>
+
+        <!-- ---------- positive bus bar ---------- -->
+        <line x1="544" y1="86" x2="544" y2="466" stroke="var(--pos)" stroke-width="4"/>
+        <g stroke="var(--pos)" stroke-width="1.6">
+          <line x1="522" y1="96" x2="544" y2="96"/>
+          <line x1="522" y1="168" x2="544" y2="168"/>
+          <line x1="522" y1="240" x2="544" y2="240"/>
+          <line x1="522" y1="312" x2="544" y2="312"/>
+          <line x1="522" y1="384" x2="544" y2="384"/>
+          <line x1="522" y1="456" x2="544" y2="456"/>
+        </g>
+        <g fill="var(--pos)">
+          <circle cx="544" cy="96" r="3.2"/><circle cx="544" cy="168" r="3.2"/>
+          <circle cx="544" cy="240" r="3.2"/><circle cx="544" cy="312" r="3.2"/>
+          <circle cx="544" cy="384" r="3.2"/><circle cx="544" cy="456" r="3.2"/>
+        </g>
+        <text class="svg-label" x="596" y="250" style="fill:var(--pos)">+ bus</text>
+        <text class="svg-sub" x="596" y="266">same bar,</text>
+        <text class="svg-sub" x="596" y="279">other end wall</text>
+
+        <!-- ---------- the two leads out ---------- -->
+        <path d="M160,466 L160,548 L760,548" fill="none" stroke="var(--neg)" stroke-width="3"/>
+        <path d="M544,466 L544,506 L596,506" fill="none" stroke="var(--pos)" stroke-width="3"/>
+        <text class="svg-sub" x="200" y="542">20 AWG silicone &mdash; red +, black &minus;</text>
+
+        <!-- fuse, in the positive leg only -->
+        <rect x="596" y="494" width="68" height="24" rx="3" fill="var(--surface)" stroke="var(--pos)" stroke-width="1.6"/>
+        <text class="svg-sub" x="630" y="510" text-anchor="middle" style="fill:var(--pos)">F ~1.5 A</text>
+        <path d="M664,506 L760,506" fill="none" stroke="var(--pos)" stroke-width="3"/>
+
+        <!-- strain relief: both leads lace through before their joints -->
+        <ellipse cx="712" cy="527" rx="20" ry="30" fill="none" stroke="var(--ink-2)" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <text class="svg-sub" x="712" y="578" text-anchor="middle">both leads lace</text>
+        <text class="svg-sub" x="712" y="591" text-anchor="middle">through a base hole</text>
+        <text class="svg-sub" x="712" y="604" text-anchor="middle" style="fill:var(--ink)">BEFORE the joint</text>
+
+        <!-- ---------- the plug ---------- -->
+        <text class="svg-sub" x="700" y="470">&#9888; polarity is NOT keyed by the shell</text>
+        <text class="svg-sub" x="700" y="484">JST-PH 2-pin &mdash; the charger board dictates it</text>
+        <rect x="760" y="494" width="22" height="60" rx="3" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.4"/>
+        <text class="svg-sub" x="771" y="512" text-anchor="middle" style="font-size:8px;fill:var(--pos)">+</text>
+        <text class="svg-sub" x="771" y="542" text-anchor="middle" style="font-size:8px;fill:var(--neg)">&minus;</text>
+        <line x1="782" y1="524" x2="828" y2="524" stroke="var(--ink-2)" stroke-width="1.5"/>
+        <polygon points="828,519 840,524 828,529" fill="var(--ink-2)"/>
+        <text class="svg-sub" x="850" y="514">to the fuel gauge&rsquo;s</text>
+        <text class="svg-sub" x="850" y="528" style="fill:var(--ink)">LEFT port</text>
+        <text class="svg-sub" x="850" y="548">the parts book</text>
+        <text class="svg-sub" x="850" y="561">has the rest</text>
+
+        <!-- ---------- the two thermistors ---------- -->
+        <rect x="690" y="60" width="290" height="112" rx="4" fill="var(--surface)" stroke="var(--ink)"/>
+        <text class="svg-label" x="702" y="80">Two thermistors ride here too</text>
+        <text class="svg-sub" x="702" y="98">NTC #1 &rarr; the charger&rsquo;s TS pin (FW-09)</text>
+        <text class="svg-sub" x="702" y="112">the cold-charge inhibit, in hardware</text>
+        <text class="svg-sub" x="702" y="130">NTC #2 &rarr; carrier J7 (IO13, IO34)</text>
+        <text class="svg-sub" x="702" y="144">the report, in software</text>
+        <text class="svg-sub" x="702" y="162" style="fill:var(--ink)">separate parts, by design</text>
+
+        <!-- ---------- what the pack is ---------- -->
+        <rect x="690" y="192" width="290" height="110" rx="4" fill="var(--surface)" stroke="var(--ink)"/>
+        <text class="svg-label" x="702" y="212">All six in parallel</text>
+        <text class="svg-sub" x="702" y="230">6 &times; 3450 mAh &rarr; ~21 Ah at 3.0&ndash;4.2 V</text>
+        <text class="svg-sub" x="702" y="244">the pack voltage IS the cell voltage:</text>
+        <text class="svg-sub" x="702" y="258">nothing is in series, so no balance</text>
+        <text class="svg-sub" x="702" y="272">lead and no BMS to fit</text>
+        <text class="svg-sub" x="702" y="290" style="fill:var(--ink)">protection = the cells&rsquo; own PCBs</text>
+
+        <!-- ---------- why 20 AWG ---------- -->
+        <rect x="690" y="322" width="290" height="130" rx="4" fill="var(--surface)" stroke="var(--ink)"/>
+        <text class="svg-label" x="702" y="342">Why 20 AWG</text>
+        <text class="svg-sub" x="702" y="360">these two wires carry everything the</text>
+        <text class="svg-sub" x="702" y="374">probe draws &mdash; the modem&rsquo;s ~500 mA</text>
+        <text class="svg-sub" x="702" y="388">burst included &mdash; and all charge</text>
+        <text class="svg-sub" x="702" y="402">current back inward</text>
+        <text class="svg-sub" x="702" y="420" style="fill:var(--ink)">worst legitimate draw ~0.6 A;</text>
+        <text class="svg-sub" x="702" y="434" style="fill:var(--ink)">the fuse is ~1.5 A</text>
+      </svg>
+    </div>
+    <figcaption>Six cells, twelve contacts, two bus bars, two wires, one plug. The
+    only current path out of the battery is the pair at the bottom right — which is
+    why the fuse sits in it, why it is 20 AWG, and why both leads are laced through
+    the platform before their joints.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Build order</h2>
+  <p class="dim">Steps 1 and 2 cannot be swapped. Everything after the bus is
+  soldered is difficult to undo without heating a joint next to a cell.</p>
+  <ol class="steps">
+    <li><div><b>Match the cells.</b> Measure all six open-circuit. If any pair
+      differs by more than ~50 mV, rest or charge them together until they agree.
+      A mismatched pair balances through the bus the instant you close it, and
+      nothing in this design limits that current.</div></li>
+    <li><div><b>Fit the twelve contacts</b> — one spring and one flat plate per
+      bay, uxcell 16.5 × 16 mm nickel-plated. They are fitted by hand after
+      printing; the end wall backs each one over 12.000 mm unbroken, and each
+      stands 1.801 mm proud of the wall into open air.</div></li>
+    <li><div><b>Lay each bus bar in its slot</b> — bare solid 18–20 AWG copper
+      down the 1.100 × 111.2 mm channel in the end wall, and solder it to all
+      six contacts on that side. Do this with the bays <i>empty</i>: the cells go
+      in last, and a soldering iron does not belong next to a lithium cell.</div></li>
+    <li><div><b>Solder the two leads</b> — 20 AWG silicone, red to the positive
+      bus, black to the negative — <b>after</b> lacing each one through its hole
+      in the platform base. Any later pull then lands on plastic instead of on
+      the joint.</div></li>
+    <li><div><b>Put the fuse in the positive leg</b>, ~1.5 A, in series. Not the
+      negative leg: a fuse in the return leaves the positive rail live against
+      the hull and everything in it after the fuse has blown.</div></li>
+    <li><div><b>Crimp the JST-PH plug</b> — red to the pin the gauge and charger
+      treat as positive. The shell does not key polarity for you; confirm it
+      against the gauge's own marking before the first power-up.</div></li>
+    <li><div><b>Drop the cells in</b>, button-tops toward the plate contacts, and
+      fit the 3 mm foam pad over them.</div></li>
+    <li><div><b>Check before power:</b> pack voltage at the plug (3.0–4.2 V,
+      never negative), continuity from each cell to its bus, and no continuity
+      between the two buses.</div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>What each joint carries</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Joint</th><th>Carries</th><th>Why it is what it is</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">cell → contact</td><td>up to ⅙ of the load</td><td>A pressure contact, not a joint. Nothing is soldered or welded to a cell anywhere in this build</td></tr>
+        <tr><td class="mono">contact → bus</td><td>up to ⅙ of the load</td><td>Soldered. The printed channel holds the bar straight and takes the mechanical load off the joint</td></tr>
+        <tr><td class="mono">bus → lead</td><td><b>everything</b></td><td>The single point where the whole pack's current leaves. Laced for strain relief before soldering</td></tr>
+        <tr><td class="mono">the two leads</td><td><b>everything</b></td><td>20 AWG silicone. ~0.6 A worst legitimate draw, the modem's ~500 mA burst included; all charge current flows back the same way</td></tr>
+        <tr><td class="mono">fuse, + leg</td><td><b>everything</b></td><td>~1.5 A, ~2.5× headroom over 0.6 A. Re-rated by ADR 0014 from 2.5–3 A — a 3 A fuse in front of a 0.6 A load lets a 2 A fault run indefinitely inside a sealed hull</td></tr>
+        <tr><td class="mono">JST-PH plug</td><td><b>everything</b></td><td>Not a choice — the charger board dictates the connector. The gauge sits inline behind it: pack → left port, charger → right</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="note">
+  <h3>The pack is one node, not a supply</h3>
+  <p>The cells, the charger's <span class="net">BAT</span> pad and the carrier's
+  <span class="net">J5</span> are all <b>one electrical point</b>. Nothing draws
+  <i>through</i> the charger — it only pushes current into that node when the sun
+  is up. So these two wires are not "the charging wires": they are the probe's
+  entire power path, in both directions, and the fuse in them is the only hardware
+  between a 21 Ah bank and a harness fault.</p>
+</div>
+
+<section>
+  <h2>Open, and not to be guessed at the bench</h2>
+  <div>
+    <div class="open-item">
+      <div class="id">HULL-23</div>
+      <div class="what"><b>The twelve contacts have no retention design.</b> They
+      are fitted by hand after printing and there is no generator feature holding
+      them. How they stay put through a Drake Passage winter is undecided.</div>
+    </div>
+    <div class="open-item">
+      <div class="id">PROC-08</div>
+      <div class="what"><b>The fuse is not bought.</b> Four × ~1.5 A, re-rated by
+      ADR 0014. No fuse holder is specified either — inline glass, a PTC, or a
+      soldered pigtail is an open choice.</div>
+    </div>
+    <div class="open-item">
+      <div class="id">HULL-27</div>
+      <div class="what"><b>Which end takes the spring.</b> The note records one
+      spring and one plate per bay but not which goes where. The drawing above puts
+      the spring on the flat negative end, where it takes up cell-length tolerance
+      — that is the usual convention, not something this tree has decided.</div>
+    </div>
+    <div class="open-item">
+      <div class="id">HULL-27</div>
+      <div class="what"><b>The bus-bar channel is a reading, not a specification.</b>
+      The 1.100 × 111.2 mm slot is unexplained by the generator; the 2026-09-03 note
+      infers its purpose from the fact that 18 AWG solid copper is 1.024 mm. The
+      spec models no bus bar at all.</div>
+    </div>
+    <div class="open-item">
+      <div class="id">HULL-24</div>
+      <div class="what"><b>Bay clearance is 0.200 mm a side</b> — tight for ASA
+      before elephant's foot — and the bays leave 3.900 mm over a 3 mm foam pad.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Sources: ADR&nbsp;0005 (six cells, parallel) · <span class="net">docs/architecture-power-and-wiring.md</span>
+  §Battery protection and §Wire and connector rules · <span class="net">docs/lab-notes/2026-09-03-integrated-battery-platform.md</span>
+  §7 (bays, contacts, the slot) · ADR&nbsp;0014 (the fuse re-rating) ·
+  <span class="net">device/hardware/parts.md</span>.</p>
+  <p>The plug onward — gauge, charger, and the carrier's <span class="net">J5</span> —
+  is in <span class="net">buoy-parts-book.html</span>, <i>The power source, close up</i>.</p>
+</footer>
+
+</div>
+</body>
+</html>
