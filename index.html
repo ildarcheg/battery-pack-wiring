@@ -115,6 +115,10 @@
           border-left: 4px solid var(--accent); padding: 16px 20px;
           display: flex; flex-direction: column; gap: 8px; }
   .warn p, .note p { max-width: none; }
+  .warn ul, .note ul, section ul { margin-left: 20px; display: flex;
+            flex-direction: column; gap: 7px; }
+  .warn li, .note li { max-width: none; }
+  section ul li { max-width: var(--measure); }
 
   ol.steps { display: flex; flex-direction: column; gap: 14px; counter-reset: s;
              list-style: none; }
@@ -411,14 +415,119 @@
   </div>
 </section>
 
+<section>
+  <h2>The parts, by name</h2>
+  <p class="dim">What is settled, what is owned, and what nobody has picked yet.
+  Three of these five are still a decision.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Part</th><th>Spec</th><th>Stock</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">bus bar</td><td>bare <b>solid 18–20 AWG</b> copper, laid in the 1.100 × 111.2 mm channel in each end wall</td><td>not on any list — <b>no product chosen</b></td></tr>
+        <tr><td class="mono">pack leads</td><td><b>20 AWG silicone</b> — sized for the current each carries, silicone because it stays flexible cold</td><td>the BOM carries one ~$20 line for "JST leads, silicone wire" — <b>no product chosen</b></td></tr>
+        <tr><td class="mono">fuse</td><td><b>~1.5 A inline</b> — <b>blade, glass or PTC, undecided</b>. Re-rated from 2.5–3 A by ADR 0014: the old figure assumed a 1.3 A peak the supply never sees</td><td>3 needed, <b>0 owned</b>, buy 4 (~$3) — PROC-08</td></tr>
+        <tr><td class="mono">fuse holder</td><td>follows from the fuse's form factor</td><td><b>not specified at all</b></td></tr>
+        <tr><td class="mono">the connector</td><td><b>JST-PH 2-pin, 100 mm pigtail</b> — not a choice, the charger board dictates the family</td><td><b>4 owned</b>, listed as "battery/panel leads"</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="dim">Because the pigtails are pre-made, there is <b>no crimping in this
+  build</b>. You cut one to length and solder its two wires to the pack leads. No
+  crimp tool, no loose contacts, no housing to load.</p>
+</section>
+
+<div class="warn">
+  <h3>⚠ The wire rule and the connector cannot both be obeyed</h3>
+  <p>The wiring rules say <b>20 AWG silicone</b> for the pack. The charger dictates
+  <b>JST-PH</b>. JST's own documentation gives the PH series a wire range of
+  <b>AWG 32–24</b> and a rating of <b>2 A at AWG 24</b>.</p>
+  <p><b>20 AWG does not fit a JST-PH contact.</b> It is four gauges over the
+  largest wire the crimp is specified for. So one of two things has to be true, and
+  the tree has never said which:</p>
+  <ul>
+    <li><b>The run steps down at the connector</b> — 20 AWG from the bus, spliced
+    to the pigtail's own thin wire for the last 100 mm. That is what the owned
+    pigtails already are, and it adds one soldered joint per leg.</li>
+    <li><b>Or the whole run is 24 AWG</b> and the 20 AWG rule is wrong for this
+    leg. Electrically that is fine: 0.6 A worst legitimate draw against a 2 A
+    contact rating, and about 20 mV of drop over 200 mm of both conductors. What
+    it gives up is mechanical robustness and cold flex, which is why the rule said
+    20 in the first place.</li>
+  </ul>
+  <p>One thing does line up: the <b>~1.5 A fuse sits below the connector's 2 A
+  rating</b>, so a fault the fuse tolerates is one the contacts can carry. That
+  ordering is worth keeping whichever way the gauge goes. Tracked as <b>PROC-19</b>.</p>
+</div>
+
+<section>
+  <h2>Soldering the joints</h2>
+  <p class="dim">Three kinds of joint, in the order you make them, and the rule
+  that governs all of them: <b>the iron never comes near a cell</b>. Every joint
+  below is made with the bays empty or on a lead that is not yet in the hull.</p>
+  <ol class="steps">
+    <li><div><b>Contact to bus bar</b> — the six joints down each end wall. Tin
+      the bar and the contact tab separately, then bring them together and heat
+      the <i>joint</i> until the solder flows, not the solder itself. The printed
+      channel holds the bar straight, so you are not fighting alignment while the
+      iron is on. Nickel-plated contacts take solder readily; the plating is there
+      for exactly this.</div></li>
+    <li><div><b>Bus bar to pack lead</b> — one joint per leg, and the one that
+      carries everything. <b>Lace the lead through its hole in the platform base
+      first.</b> Strip about 5 mm, tin the strands so they cannot splay, hook the
+      wire over the bar, and flow it. Sleeve it in heatshrink afterwards: this
+      joint sits inside a sealed hull for months and nothing else insulates
+      it.</div></li>
+    <li><div><b>Pack lead to pigtail</b> — if you step the gauge down at the
+      connector. Stagger the two joints along the cable so the red and black
+      splices do not sit side by side, tin both ends, and heatshrink each
+      separately before a common outer sleeve.</div></li>
+  </ol>
+  <p><b>A cold joint here is the failure you will not find.</b> It reads fine on a
+  meter at the bench, then goes high-resistance under the modem's 500 mA burst
+  months later, inside a hull nobody can open. A good joint is shiny and has
+  wetted the copper; a dull, grainy or blobbed one gets reheated with fresh flux,
+  not left alone.</p>
+</section>
+
+<section>
+  <h2>The connector, and which way round it goes</h2>
+  <p>A <b>JST-PH 2-pin</b> pigtail, 100 mm — you own four, listed for battery and
+  panel leads. It is not a choice: both candidate charger boards use this family,
+  so the pack side is fixed by the board.</p>
+  <p>Since PROC-18 closed, the pigtail does <b>not</b> go to the charger. It goes
+  to the <b>fuel gauge's left JST-PH port</b>; a second lead leaves the gauge's
+  right port for the charger's <span class="net">BAT</span> pad. The gauge sits
+  inline so it measures the pack rather than the rail it runs on.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Pin</th><th>Wire</th><th>Goes to</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">1</td><td class="mono"><span class="sw" style="background:var(--pos)"></span>red, + </td><td>the positive bus, through the ~1.5 A fuse</td></tr>
+        <tr><td class="mono">2</td><td class="mono"><span class="sw" style="background:var(--neg)"></span>black, −</td><td>the negative bus, direct</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><b>⚠ The shell does not key polarity for you.</b> A JST-PH housing mates only
+  one way round mechanically, but nothing stops the <i>wires</i> being soldered to
+  the wrong ends of it — and a pre-made pigtail's red and black are only a
+  convention, not a guarantee. Ring the pigtail out with a meter against the
+  gauge's own marking before the first power-up, and check the pack voltage at the
+  free end reads positive before it is plugged into anything.</p>
+</section>
+
 <div class="note">
   <h3>The pack is one node, not a supply</h3>
   <p>The cells, the charger's <span class="net">BAT</span> pad and the carrier's
   <span class="net">J5</span> are all <b>one electrical point</b>. Nothing draws
   <i>through</i> the charger — it only pushes current into that node when the sun
   is up. So these two wires are not "the charging wires": they are the probe's
-  entire power path, in both directions, and the fuse in them is the only hardware
-  between a 21 Ah bank and a harness fault.</p>
+  entire power path, in both directions.</p>
+  <p>The fuse in them is <b>not</b> the primary protection, and the record is
+  explicit about that since the pack went back to protected cells: each cell's own
+  PCB cuts at about <b>8 A</b>, and a short pulls through all six at once and trips
+  them together. The fuse is <b>redundancy</b> — kept because it is cheap and already
+  on order, not because it is the thing standing between a 21 Ah bank and a harness
+  fault.</p>
 </div>
 
 <section>
