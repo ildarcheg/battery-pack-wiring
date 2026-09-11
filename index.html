@@ -151,10 +151,30 @@
   a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (max-width: 640px) { .open-item { grid-template-columns: 1fr; }
     .open-item .id { border-right: none; border-bottom: 1px solid var(--rule); } }
+
+  /* the four-document menu — absolute URLs, because each page is served
+     from its own origin once published */
+  .docnav { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: baseline;
+            font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.02em;
+            padding-bottom: 12px; border-bottom: 1px solid var(--rule);
+            margin-bottom: 26px; }
+  .docnav a { color: var(--ink-3); text-decoration: none;
+              border-bottom: 1px solid transparent; padding-bottom: 2px; }
+  .docnav a:hover, .docnav a:focus-visible { color: var(--ink);
+              border-bottom-color: var(--accent); }
+  .docnav [aria-current="page"] { color: var(--ink);
+              border-bottom: 2px solid var(--accent); padding-bottom: 1px; }
 </style>
 </head>
 <body>
 <div class="page">
+
+<nav class="docnav" aria-label="Project documents">
+  <a href="https://ildarcheg.github.io/buoy-parts-book/">Parts Book</a>
+  <a href="https://ildarcheg.github.io/carrier-pcb-brief/">Carrier Brief</a>
+  <span aria-current="page">Battery Pack</span>
+  <a href="https://ildarcheg.github.io/thermal-probe-wiring/">Thermal Probe</a>
+</nav>
 
 <header>
   <p class="eyebrow">meteo · the probe's power source</p>
