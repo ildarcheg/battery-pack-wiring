@@ -45,3 +45,10 @@ The design is not finished, and the page says so where it matters. Five things
 are marked open rather than guessed — including that the bus-bar channel is
 read off the model rather than specified, and that the twelve cell contacts
 have no retention design yet.
+
+## Licence
+
+[CC BY 4.0](LICENSE). Reuse it, adapt it, publish it, with credit to
+**SouthPing** (<https://southping.org/>) and a link back. Source code in the
+project is Apache-2.0. Manufacturers' datasheets and product photographs
+remain theirs and are not covered by this grant.
